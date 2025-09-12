@@ -13,6 +13,7 @@ Create a project using React + Typescript SPA that connects to the GitHub API, a
 
 ## Installation Instructions
 
+
 ### `Install dependencies`
 
 ```

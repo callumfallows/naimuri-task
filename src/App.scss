@@ -6,10 +6,45 @@ body {
   font-family: sans-serif;
 }
 
-
 #root {
+  width: 100%;
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+}
+
+
+.searchBar {
+  width: 100%;
+}
+
+.dateOptions {
+    display: flex;
+    justify-content: space-between;
+    align-items: normal;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.sortOptions {
+  flex-direction: row;
+}
+
+.sortOptions > div {
+  display: flex;
+}
+
+.paginationButtons {
+  display: flex;
+  gap: 1rem;
+justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.pageNumber {
+  margin-top: 1rem;
+  font-size: 1.2rem;
+  font-weight: bold;
 }
