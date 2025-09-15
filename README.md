@@ -4,13 +4,13 @@ Create a project using React + Typescript SPA that connects to the GitHub API, a
 
 ## Features
 
-[/] - UI/UX
-[ ] - Accessibility
-[/] - GitHub API
-[/] - Search
-[/] - Filter
-[/] - Sort
-[/] - Pagination
+- [x] - UI/UX
+- [x] - Accessibility
+- [x] - GitHub API
+- [x] - Search
+- [x] - Filter
+- [x] - Sort
+- [x]- Pagination
 
 ## Installation Instructions
 
