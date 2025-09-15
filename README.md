@@ -2,6 +2,10 @@
 
 Create a project using React + Typescript SPA that connects to the GitHub API, allowing search and filtering of repository through an easy to use interface.
 
+## Preview
+
+You can preview this application using [Vercel](https://namuri-task.vercel.app/)
+
 ## Features
 
 - [x] - UI/UX
