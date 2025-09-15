@@ -10,7 +10,7 @@ Create a project using React + Typescript SPA that connects to the GitHub API, a
 - [x] - Search
 - [x] - Filter
 - [x] - Sort
-- [x]- Pagination
+- [x] - Pagination
 
 ## Installation Instructions
 
@@ -35,7 +35,23 @@ npm run start
 
 ## Implementation
 
-### Material UI
+### Notes
+
+I was quite happy with how I structured the repository search and display components. Initially, I struggled a little with rendering all repository statistics cleanly in the card without overcrowding, but using MUI’s Grid and a reusable StatBox component helped make it much more readable and maintainable.
+
+For state management, I decided to use useState for the modal and readme loading instead of setting up Redux or Context. This was a conscious decision based on time constraints. If this were a larger project, I would consider using a global state solution to manage repositories and readme data more efficiently.
+
+Fetching the README using the custom useGetReadme hook worked well, though I did run into occasional issues where the response would fail or the PAT (personal access token) became invalid quickly. I’ve handled loading and error states in the modal to ensure the UI fails gracefully, showing either a loader or an error message.
+
+For component design, I focused on making everything modular: RepositoryCard, StatBox, and ReadmeModal are all reusable and typed with TypeScript. I initially passed all repository props individually but then refactored to spread the repository object for cleaner code.
+
+I was unsure/ unable to complete the task requirement for "likes" on a repository as mentioned: "...detailed view containing the forks, likes, *stars* and issue". I would ask more questions before starting the project again rather than just trying to implement what I could from the API response
+
+Testing was something I planned to include, particularly to ensure filtering and error handling work as expected. Currently, the project relies on visual validation, but adding unit tests and integration tests for the repository fetching and modal behavior would be a priority if more time were available.
+
+Lastly, working with MUI’s useMediaQuery and responsive grids was very useful to ensure cards looked good on both desktop and mobile without duplicating too much code. I was initially passing conditional props based on isMobile, but switching to xs={12} sm={6} simplified things significantly.
+
+#### Material UI
 
 - Used for rapid UI development and consistent component styling.
 
@@ -43,7 +59,7 @@ npm run start
 
 - Allows customization via themes and sx props for responsive design.
 
-### Accessibility
+#### Accessibility
 
 - Uses semantic HTML elements like label, input, and link.
 
@@ -53,7 +69,7 @@ npm run start
 
 - Ensures color contrast and readable text sizes for statistics and buttons.
 
-### User Experience
+#### User Experience
 
 - Responsive layout adapts for mobile, tablet, and desktop.
 
@@ -63,7 +79,7 @@ npm run start
 
 - Loading indicators and disabled states improve feedback during fetch.
 
-### Debouncing
+#### Debouncing
 
 - Implemented to prevent excessive API calls during search input changes.
 
@@ -71,7 +87,7 @@ npm run start
 
 - Enhances user experience by reducing flicker and unnecessary network requests.
 
-### Custom Hooks
+#### Custom Hooks
 
 - Encapsulates logic for fetching GitHub repositories in useRepositorySearch.
 
@@ -79,7 +95,7 @@ npm run start
 
 - Keeps components clean and reusable by separating concerns (UI vs data fetching).
 
-### Pagination
+#### Pagination
 
 - Supports previous and next on mobile/tablet and page navigation on desktop.
 
@@ -87,7 +103,7 @@ npm run start
 
 - Uses GitHub API limits efficiently and prevents fetching beyond the maximum allowed pages.
 
-### Date Filtering
+#### Date Filtering
 
 - Allows users to filter repositories by creation date (from and to).
 
@@ -95,7 +111,7 @@ npm run start
 
 - Updates search automatically when date filters change.
 
-### Testing
+#### Testing
 
 - Not fully implemented due to time constraints, but planned using Jest and React Testing Library.
 
@@ -104,3 +120,4 @@ npm run start
 - Add WCAG accessiblity tests as part of build pipeline
 
 - Ensure robustness for search, pagination, and error handling.
+
