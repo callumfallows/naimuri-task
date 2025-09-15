@@ -13,7 +13,7 @@ import {
   useTheme,
 } from '@mui/material';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.scss';
 import RepositoryResults from './RepositoryResults';
 import { useRepositorySearch } from './useRepositorySearch';
@@ -55,6 +55,10 @@ function App() {
       orderBy,
       page,
     });
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, createdFrom, createdTo, sortBy, orderBy]);
 
   const totalPages = Math.ceil(Math.min(repositoryCount / LIMIT, 1000 / LIMIT));
   const hasMorePages = page < totalPages;
