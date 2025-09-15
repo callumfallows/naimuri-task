@@ -14,6 +14,7 @@ import {
 import { useState } from 'react';
 import './App.scss';
 import RepositoryResults from './RepositoryResults';
+import { useRepositorySearch } from './useRepositorySearch';
 
 /**
  * Repository Search Application
@@ -61,12 +62,15 @@ function App() {
   const handleNext = () => setPage(curr => curr + 1);
 
   // Fetch repository data
-  const { repositories, repositoryCount, isLoading, error } = {
-    repositories: [],
-    repositoryCount: 0,
-    isLoading: false,
-    error: '',
-  }; // Placeholder for actual data fetching logic
+  const { repositories, repositoryCount, isLoading, error } =
+    useRepositorySearch({
+      searchTerm,
+      createdFrom,
+      createdTo,
+      sortBy,
+      orderBy,
+      page,
+    });
 
   // Pagination calculations
   const totalPages = Math.ceil(Math.min(repositoryCount / LIMIT, 1000 / LIMIT));
