@@ -1,57 +1,45 @@
 import { Grid } from '@mui/material';
 import type { RepositoryType } from './interfaces';
-import RepoCard from './RepositoryCard';
+import RepositoryCard from './RepositoryCard';
+
+type RepositoryResultsProps = {
+  repositories: RepositoryType[];
+  isLoading: boolean;
+  error: string;
+  searchTerm: string;
+};
 
 function RepositoryResults({
   repositories,
   isLoading,
   error,
   searchTerm,
-}: {
-  repositories: RepositoryType[];
-  isLoading: boolean;
-  error: string;
-  searchTerm: string;
-}) {
+}: RepositoryResultsProps) {
+  if (isLoading) {
+    return <p>Loading repositories...</p>;
+  }
+
+  if (error) {
+    return <p>{error}</p>;
+  }
+
+  if (repositories.length === 0) {
+    return (
+      <p>
+        {searchTerm
+          ? 'No repositories found for search criteria'
+          : 'Search for repositories using the form above'}
+      </p>
+    );
+  }
+
   return (
     <div className='repositoryItems'>
-      {repositories.length > 0 ? (
-        <Grid container spacing={2}>
-          {repositories.map(
-            ({
-              forks_count,
-              full_name,
-              html_url,
-              id,
-              name,
-              open_issues_count,
-              owner,
-              stargazers_count,
-            }) => (
-              <RepoCard
-                forks_count={forks_count}
-                full_name={full_name}
-                html_url={html_url}
-                key={id}
-                name={name}
-                open_issues_count={open_issues_count}
-                owner={owner}
-                stargazers_count={stargazers_count}
-              />
-            )
-          )}
-        </Grid>
-      ) : isLoading ? (
-        <p>Loading reposistories...</p>
-      ) : error ? (
-        <p>{error}</p>
-      ) : (
-        <p>
-          {searchTerm
-            ? 'No repos found for search criteria'
-            : 'Search for repositories using the form above'}
-        </p>
-      )}
+      <Grid container spacing={2}>
+        {repositories.map(repo => (
+          <RepositoryCard key={repo.id} {...repo} />
+        ))}
+      </Grid>
     </div>
   );
 }

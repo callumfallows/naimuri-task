@@ -15,11 +15,15 @@ import {
   CardContent,
   Grid,
   Link,
+  Modal,
   Typography,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
+import React, { useState } from 'react';
+import Markdown from 'react-markdown';
 import type { RepositoryType } from './interfaces';
+import { useGetReadme } from './useGetReadme';
 
 // Extracted constants for better maintainability
 const STAT_CONFIGS = {
@@ -99,18 +103,60 @@ const StatBox = ({
   );
 };
 
+// Readme modal
+export function BasicModal({ full_name }: { full_name: string }) {
+  const [open, setOpen] = React.useState(true);
+  const handleClose = () => setOpen(false);
+  const { error, isLoading, readme } = useGetReadme(full_name);
+
+  return (
+    <div>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby='modal-modal-title'
+        aria-describedby='modal-modal-description'
+      >
+        <Box>
+          {isLoading ? (
+            <p>Loading readme...</p>
+          ) : error ? (
+            <p>{error}</p>
+          ) : (
+            <div
+              style={{
+                padding: '20px',
+                backgroundColor: 'white',
+                maxHeight: '80vh',
+                overflowY: 'auto',
+                color: 'black',
+              }}
+            >
+              <Markdown>{readme}</Markdown>
+            </div>
+          )}
+        </Box>
+      </Modal>
+    </div>
+  );
+}
+
 // Main component with improved structure
-const RepoCard = ({
+const RepoistoryCard = ({
   name,
   owner,
   html_url,
   stargazers_count,
+  full_name,
   forks_count,
   open_issues_count,
 }: RepositoryType) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // < 600px
-
+  const [open, setOpen] = useState(false);
+  const handleShowReadme = () => {
+    setOpen(curr => !curr);
+  };
   return (
     <Grid size={isMobile ? 12 : 6}>
       <Card
@@ -214,31 +260,46 @@ const RepoCard = ({
 
         {/* Action Section */}
         <CardActions sx={{ justifyContent: 'flex-end', pt: 0, pb: 2, px: 2 }}>
-          {html_url ? (
+          <>
+            {html_url ? (
+              <Button
+                href={html_url}
+                target='_blank'
+                rel='noopener noreferrer'
+                variant='contained'
+                startIcon={<GitHubIcon />}
+                endIcon={<OpenInNewIcon />}
+                size='small'
+                sx={{
+                  textTransform: 'none',
+                  borderRadius: 2,
+                }}
+              >
+                View Repository
+              </Button>
+            ) : (
+              <Button disabled size='small'>
+                Repository Unavailable
+              </Button>
+            )}
             <Button
-              href={html_url}
-              target='_blank'
               rel='noopener noreferrer'
               variant='contained'
-              startIcon={<GitHubIcon />}
-              endIcon={<OpenInNewIcon />}
               size='small'
               sx={{
                 textTransform: 'none',
                 borderRadius: 2,
               }}
+              onClick={handleShowReadme}
             >
-              View Repository
+              View Read Me
             </Button>
-          ) : (
-            <Button disabled size='small'>
-              Repository Unavailable
-            </Button>
-          )}
+            {open && <BasicModal full_name={full_name} />}
+          </>
         </CardActions>
       </Card>
     </Grid>
   );
 };
 
-export default RepoCard;
+export default RepoistoryCard;
