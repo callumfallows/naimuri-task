@@ -117,42 +117,40 @@ function App() {
             {/* Sort By */}
             <Stack className='sortOptions' sx={{ minWidth: '150px' }}>
               <FormControl fullWidth>
-                <InputLabel>
-                  Sort By
-                  <Select
-                    id='sortBy'
-                    name='sortBy'
-                    fullWidth
-                    value={sortBy}
-                    onChange={e => setSortBy(e.target.value)}
-                    size={isMobile ? 'small' : 'medium'}
-                  >
-                    <MenuItem value='updated'>Updated</MenuItem>
-                    <MenuItem value='stars'>Stars</MenuItem>
-                    <MenuItem value='forks'>Forks</MenuItem>
-                    <MenuItem value='help-wanted-issues'>Issues</MenuItem>
-                  </Select>
-                </InputLabel>
+                <InputLabel id='sortByLabel'>Sort By</InputLabel>
+                <Select
+                  labelId='sortByLabel'
+                  id='soryBy'
+                  label='Sort By'
+                  fullWidth
+                  value={sortBy}
+                  onChange={e => setSortBy(e.target.value)}
+                  size={isMobile ? 'small' : 'medium'}
+                >
+                  <MenuItem value='updated'>Updated</MenuItem>
+                  <MenuItem value='stars'>Stars</MenuItem>
+                  <MenuItem value='forks'>Forks</MenuItem>
+                  <MenuItem value='help-wanted-issues'>Issues</MenuItem>
+                </Select>
               </FormControl>
             </Stack>
 
             {/* Order By */}
             <Stack className='orderOptions' sx={{ minWidth: '150px' }}>
               <FormControl fullWidth>
-                <InputLabel>
-                  Order By
-                  <Select
-                    id='orderBy'
-                    name='orderBy'
-                    fullWidth
-                    value={orderBy}
-                    onChange={e => setOrderBy(e.target.value)}
-                    size={isMobile ? 'small' : 'medium'}
-                  >
-                    <MenuItem value='desc'>Descending</MenuItem>
-                    <MenuItem value='asc'>Ascending</MenuItem>
-                  </Select>
-                </InputLabel>
+                <InputLabel id='orderByLabel'>Order By</InputLabel>
+                <Select
+                  labelId='orderByLabel'
+                  id='orderBy'
+                  label='Order By'
+                  fullWidth
+                  value={orderBy}
+                  onChange={e => setOrderBy(e.target.value)}
+                  size={isMobile ? 'small' : 'medium'}
+                >
+                  <MenuItem value='desc'>Descending</MenuItem>
+                  <MenuItem value='asc'>Ascending</MenuItem>
+                </Select>
               </FormControl>
             </Stack>
           </Stack>
