@@ -2,6 +2,7 @@ import {
   ForkRight as ForkIcon,
   GitHub as GitHubIcon,
   BugReport as IssueIcon,
+  ThumbUp as LikeIcon,
   OpenInNew as OpenInNewIcon,
   Person as PersonIcon,
   Star as StarIcon,
@@ -39,6 +40,12 @@ const STAT_CONFIGS = {
     color: '#d32f2f',
     bgColor: 'rgba(211, 47, 47, 0.1)',
     borderColor: 'rgba(211, 47, 47, 0.2)',
+  },
+  likes: {
+    icon: LikeIcon,
+    color: '#31d151',
+    bgColor: 'rgba(111, 209, 42, 0.1)',
+    borderColor: 'rgba(111, 209, 42, 0.2)',
   },
 };
 
@@ -103,8 +110,9 @@ const RepoCard = ({
 }: RepositoryType) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // < 600px
+
   return (
-    <Grid size={isMobile ? 12 : 4}>
+    <Grid size={isMobile ? 12 : 6}>
       <Card
         sx={{
           height: '100%', // Ensures consistent card heights
@@ -182,20 +190,23 @@ const RepoCard = ({
             </Typography>
 
             <Grid container spacing={1}>
-              <Grid size={4}>
+              <Grid size={3}>
                 <StatBox type='stars' count={stargazers_count} label='stars' />
               </Grid>
 
-              <Grid size={4}>
+              <Grid size={3}>
                 <StatBox type='forks' count={forks_count} label='forks' />
               </Grid>
 
-              <Grid size={4}>
+              <Grid size={3}>
                 <StatBox
                   type='issues'
                   count={open_issues_count}
                   label='issues'
                 />
+              </Grid>
+              <Grid size={3}>
+                <StatBox type='likes' count={0} label='likes' />
               </Grid>
             </Grid>
           </Box>
