@@ -1,4 +1,5 @@
 import {
+  Close as CloseIcon,
   ForkRight as ForkIcon,
   GitHub as GitHubIcon,
   BugReport as IssueIcon,
@@ -13,14 +14,17 @@ import {
   Card,
   CardActions,
   CardContent,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Grid,
+  IconButton,
   Link,
-  Modal,
   Typography,
-  useMediaQuery,
-  useTheme,
 } from '@mui/material';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Markdown from 'react-markdown';
 import type { RepositoryType } from './interfaces';
 import { useGetReadme } from './useGetReadme';
@@ -51,14 +55,16 @@ const STAT_CONFIGS = {
     bgColor: 'rgba(111, 209, 42, 0.1)',
     borderColor: 'rgba(111, 209, 42, 0.2)',
   },
-};
+} as const;
+
+type StatKey = keyof typeof STAT_CONFIGS;
 
 const StatBox = ({
   type,
   count,
   label,
 }: {
-  type: keyof typeof STAT_CONFIGS;
+  type: StatKey;
   count: number;
   label: string;
 }) => {
@@ -66,7 +72,10 @@ const StatBox = ({
   const IconComponent = config.icon;
 
   return (
+    // role="group" with an accessible name so screen readers get "stars 1,234"
     <Box
+      role='group'
+      aria-label={`${label} ${count.toLocaleString()}`}
       display='flex'
       alignItems='center'
       gap={0.5}
@@ -78,15 +87,13 @@ const StatBox = ({
         minWidth: 0, // Prevents overflow
       }}
     >
+      {/* Icon is decorative — hide from screen readers */}
       <IconComponent
         sx={{ fontSize: 16, color: config.color, flexShrink: 0 }}
+        aria-hidden='true'
       />
-      <Typography
-        variant='body2'
-        fontWeight='500'
-        sx={{ minWidth: 0 }} // Allows text to shrink if needed
-      >
-        {count.toLocaleString()} {/* Format large numbers with commas */}
+      <Typography variant='body2' fontWeight='500' sx={{ minWidth: 0 }}>
+        {count.toLocaleString()}
       </Typography>
       <Typography
         variant='caption'
@@ -96,6 +103,7 @@ const StatBox = ({
           overflow: 'hidden',
           textOverflow: 'ellipsis',
         }}
+        aria-hidden='true' // label text is included in the group aria-label so hide this duplicate text
       >
         {label}
       </Typography>
@@ -103,45 +111,87 @@ const StatBox = ({
   );
 };
 
-// Readme modal
-export function BasicModal({ full_name }: { full_name: string }) {
-  const [open, setOpen] = React.useState(true);
-  const handleClose = () => setOpen(false);
+// Accessible Readme dialog that replaces the raw Modal
+export function ReadmeDialog({
+  full_name,
+  open,
+  onClose,
+}: {
+  full_name: string;
+  open: boolean;
+  onClose: () => void;
+}) {
   const { error, isLoading, readme } = useGetReadme(full_name);
 
+  const dialogTitleId = `readme-dialog-title-${full_name.replace(/\W/g, '-')}`;
+  const dialogDescriptionId = `readme-dialog-desc-${full_name.replace(/\W/g, '-')}`;
+
   return (
-    <div>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby='modal-modal-title'
-        aria-describedby='modal-modal-description'
+    <Dialog
+      open={open}
+      onClose={onClose}
+      aria-labelledby={dialogTitleId}
+      aria-describedby={dialogDescriptionId}
+      fullWidth
+      maxWidth='md'
+    >
+      <DialogTitle
+        id={dialogTitleId}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
       >
-        <Box>
-          {isLoading ? (
-            <p>Loading readme...</p>
-          ) : error ? (
-            <p>{error}</p>
-          ) : (
-            <div
-              style={{
-                padding: '20px',
-                backgroundColor: 'white',
-                maxHeight: '80vh',
-                overflowY: 'auto',
-                color: 'black',
-              }}
-            >
-              <Markdown>{readme}</Markdown>
-            </div>
-          )}
-        </Box>
-      </Modal>
-    </div>
+        {/* Title announces the repository name */}
+        <span>README — {full_name}</span>
+        {/* Accessible close button */}
+        <IconButton
+          aria-label='Close readme dialog'
+          onClick={onClose}
+          size='small'
+        >
+          <CloseIcon aria-hidden='true' />
+        </IconButton>
+      </DialogTitle>
+
+      <DialogContent dividers>
+        {/* Provide polite live region for loading/error — screen readers get updates */}
+        {isLoading ? (
+          <Box
+            role='status'
+            aria-live='polite'
+            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+          >
+            <CircularProgress size={18} aria-hidden='true' />
+            <Typography>Loading README…</Typography>
+          </Box>
+        ) : error ? (
+          <Typography role='status' aria-live='polite' color='error'>
+            {error}
+          </Typography>
+        ) : readme ? (
+          // The markdown content is the main document content in the dialog
+          <article id={dialogDescriptionId}>
+            <Markdown>{readme}</Markdown>
+          </article>
+        ) : (
+          <Typography role='status' aria-live='polite'>
+            No README available.
+          </Typography>
+        )}
+      </DialogContent>
+
+      <DialogActions>
+        <Button onClick={onClose} aria-label='Close readme'>
+          Close
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 }
 
-// Main component with improved structure
+// Main component with improved structure and accessibility
 const RepoistoryCard = ({
   name,
   owner,
@@ -151,14 +201,15 @@ const RepoistoryCard = ({
   forks_count,
   open_issues_count,
 }: RepositoryType) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // < 600px
   const [open, setOpen] = useState(false);
-  const handleShowReadme = () => {
-    setOpen(curr => !curr);
-  };
+  const handleShowReadme = () => setOpen(curr => !curr);
+
+  // Dialog accessibility IDs
+  const dialogId = `readme-dialog-${full_name.replace(/\W/g, '-')}`;
+
   return (
-    <Grid size={isMobile ? 12 : 6}>
+    // Use Grid item props for correct semantics / layout
+    <Grid>
       <Card
         sx={{
           height: '100%', // Ensures consistent card heights
@@ -170,9 +221,9 @@ const RepoistoryCard = ({
         {/* Header Section */}
         <CardContent sx={{ flexGrow: 1 }}>
           <Box display='flex' alignItems='center' gap={1} mb={3}>
-            <GitHubIcon color='action' />
+            {/* Decorative GitHub icon: hide from assistive tech */}
+            <GitHubIcon color='action' aria-hidden='true' />
             <Typography
-              variant='h6'
               component='h2'
               fontWeight='bold'
               sx={{
@@ -188,7 +239,7 @@ const RepoistoryCard = ({
           {/* Repository Info Section */}
           <Box mb={3}>
             <Typography
-              variant='subtitle2'
+              component='h3'
               color='text.secondary'
               sx={{ fontWeight: 600, mb: 1 }}
             >
@@ -197,7 +248,11 @@ const RepoistoryCard = ({
 
             {owner ? (
               <Box display='flex' alignItems='center' gap={1}>
-                <PersonIcon fontSize='small' color='action' />
+                <PersonIcon
+                  fontSize='small'
+                  color='action'
+                  aria-hidden='true'
+                />
                 <Link
                   href={owner.html_url}
                   target='_blank'
@@ -211,10 +266,13 @@ const RepoistoryCard = ({
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
                   }}
+                  // Clear accessible label describing destination and that it opens in a new tab
+                  aria-label={`Visit ${owner.login}'s GitHub profile (opens in a new tab)`}
                 >
                   {owner.login}
                   <OpenInNewIcon
                     sx={{ ml: 0.5, fontSize: 16, flexShrink: 0 }}
+                    aria-hidden='true'
                   />
                 </Link>
               </Box>
@@ -228,7 +286,7 @@ const RepoistoryCard = ({
           {/* Statistics Section */}
           <Box>
             <Typography
-              variant='subtitle2'
+              component={'h3'}
               color='text.secondary'
               sx={{ fontWeight: 600, mb: 2 }}
             >
@@ -236,22 +294,23 @@ const RepoistoryCard = ({
             </Typography>
 
             <Grid container spacing={1}>
-              <Grid size={3}>
+              <Grid size={{ xs: 6, sm: 3 }}>
                 <StatBox type='stars' count={stargazers_count} label='stars' />
               </Grid>
 
-              <Grid size={3}>
+              <Grid size={{ xs: 6, sm: 3 }}>
                 <StatBox type='forks' count={forks_count} label='forks' />
               </Grid>
 
-              <Grid size={3}>
+              <Grid size={{ xs: 6, sm: 3 }}>
                 <StatBox
                   type='issues'
                   count={open_issues_count}
                   label='issues'
                 />
               </Grid>
-              <Grid size={3}>
+
+              <Grid size={{ xs: 6, sm: 3 }}>
                 <StatBox type='likes' count={0} label='likes' />
               </Grid>
             </Grid>
@@ -267,23 +326,24 @@ const RepoistoryCard = ({
                 target='_blank'
                 rel='noopener noreferrer'
                 variant='contained'
-                startIcon={<GitHubIcon />}
-                endIcon={<OpenInNewIcon />}
+                startIcon={<GitHubIcon aria-hidden='true' />}
+                endIcon={<OpenInNewIcon aria-hidden='true' />}
                 size='small'
                 sx={{
                   textTransform: 'none',
                   borderRadius: 2,
                 }}
+                aria-label={`Open ${name} repository on GitHub (opens in a new tab)`}
               >
                 View Repository
               </Button>
             ) : (
-              <Button disabled size='small'>
+              <Button disabled size='small' aria-disabled>
                 Repository Unavailable
               </Button>
             )}
+
             <Button
-              rel='noopener noreferrer'
               variant='contained'
               size='small'
               sx={{
@@ -291,10 +351,21 @@ const RepoistoryCard = ({
                 borderRadius: 2,
               }}
               onClick={handleShowReadme}
+              aria-expanded={open}
+              aria-controls={open ? dialogId : undefined}
+              aria-label={
+                open ? `Close README for ${name}` : `Open README for ${name}`
+              }
             >
               View Read Me
             </Button>
-            {open && <BasicModal full_name={full_name} />}
+
+            {/* Render the accessible dialog (controlled from parent state) */}
+            <ReadmeDialog
+              full_name={full_name}
+              open={open}
+              onClose={() => setOpen(false)}
+            />
           </>
         </CardActions>
       </Card>

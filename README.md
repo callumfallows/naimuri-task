@@ -96,3 +96,11 @@ npm run start
 - Updates search automatically when date filters change.
 
 ### Testing
+
+- Not fully implemented due to time constraints, but planned using Jest and React Testing Library.
+
+- Could cover hook logic, API calls, and component rendering.
+
+- Add WCAG accessiblity tests as part of build pipeline
+
+- Ensure robustness for search, pagination, and error handling.

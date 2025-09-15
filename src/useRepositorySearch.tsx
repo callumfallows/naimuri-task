@@ -93,7 +93,7 @@ export const useRepositorySearch = ({
     } finally {
       setIsLoading(false);
     }
-  }, [searchTerm, buildSearchUrl, resetRepositoryData]);
+  }, [searchTerm, buildSearchUrl, resetRepositoryData, page]);
 
   // Effect: Handle page changes (load more results)
   useEffect(() => {
@@ -102,7 +102,7 @@ export const useRepositorySearch = ({
       setIsLoading(true);
       fetchRepositories();
     }
-  }, [page]);
+  }, [page, searchTerm, fetchRepositories]);
 
   // Effect for handling search term changes (with debouncing)
   useEffect(() => {

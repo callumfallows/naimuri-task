@@ -1,12 +1,14 @@
 import {
   Box,
   Button,
+  FormControl,
   Grid,
-  Input,
   InputLabel,
   MenuItem,
   Select,
   Stack,
+  TextField,
+  Typography,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
@@ -16,38 +18,22 @@ import './App.scss';
 import RepositoryResults from './RepositoryResults';
 import { useRepositorySearch } from './useRepositorySearch';
 
-/**
- * Repository Search Application
- *
- * A responsive React component that provides a user interface for searching and filtering
- * GitHub repositories with date range, sorting, and pagination capabilities.
- * Automatically adjusts layout for mobile and tablet devices.
- */
-
-// Utility functions
 const dateFormatter = (date: Date) => date.toISOString().split('T')[0];
 
 const getDefaultDateRange = () => {
   const today = new Date();
   const lastMonth = new Date();
   lastMonth.setMonth(today.getMonth() - 1);
-
-  return {
-    from: dateFormatter(lastMonth),
-    to: dateFormatter(today),
-  };
+  return { from: dateFormatter(lastMonth), to: dateFormatter(today) };
 };
 
-// Constants
-export const LIMIT = 30; // GitHub API default per_page limit
+export const LIMIT = 30;
 
 function App() {
-  // Theme and breakpoint detection
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // < 600px
-  const isTablet = useMediaQuery(theme.breakpoints.down('md')); // < 900px
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
 
-  // State management
   const defaultDates = getDefaultDateRange();
   const [searchTerm, setSearchTerm] = useState('');
   const [createdFrom, setCreatedFrom] = useState(defaultDates.from);
@@ -56,12 +42,10 @@ function App() {
   const [orderBy, setOrderBy] = useState('desc');
   const [page, setPage] = useState(1);
 
-  // Event handlers
   const handleLoadMore = () => setPage(curr => curr + 1);
   const handlePrevious = () => setPage(curr => Math.max(1, curr - 1));
   const handleNext = () => setPage(curr => curr + 1);
 
-  // Fetch repository data
   const { repositories, repositoryCount, isLoading, error } =
     useRepositorySearch({
       searchTerm,
@@ -72,7 +56,6 @@ function App() {
       page,
     });
 
-  // Pagination calculations
   const totalPages = Math.ceil(Math.min(repositoryCount / LIMIT, 1000 / LIMIT));
   const hasMorePages = page < totalPages;
   const canGoBack = page > 1;
@@ -88,123 +71,112 @@ function App() {
           alignItems={isTablet ? 'stretch' : 'center'}
           className='searchWrapper'
         >
-          {/* Search Bar */}
-          <Box
-            className='searchBar'
+          {/* Search Field */}
+          <TextField
+            id='search'
+            label='Search'
+            type='text'
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            placeholder='Search for repository'
+            fullWidth
             sx={{ minWidth: isMobile ? '100%' : '300px' }}
-          >
-            {' '}
-            <InputLabel htmlFor='search' sx={{ fontSize: '0.875rem', mb: 0.5 }}>
-              Search:
-            </InputLabel>
-            <Input
-              fullWidth
-              type='text'
-              onChange={e => setSearchTerm(e.target.value)}
-              placeholder='Search for repository'
-              name='search'
-              id='search'
-              value={searchTerm}
-            />
-          </Box>
+          />
 
-          {/* Date Options */}
+          {/* Date Range */}
           <Stack
             className='dateOptions'
             direction={isMobile ? 'column' : 'row'}
             spacing={isMobile ? 1 : 2}
             sx={{ minWidth: isMobile ? '100%' : 'auto' }}
           >
-            <Stack sx={{ minWidth: isMobile ? '100%' : '150px' }}>
-              <InputLabel
-                htmlFor='dateFrom'
-                sx={{ fontSize: '0.875rem', mb: 0.5 }}
-              >
-                From:
-              </InputLabel>
-              <Input
-                value={createdFrom}
-                onChange={e => setCreatedFrom(e.target.value)}
-                type='date'
-                name='dateFrom'
-                id='dateFrom'
-                fullWidth
-              />
-            </Stack>
-            <Stack sx={{ minWidth: isMobile ? '100%' : '150px' }}>
-              <InputLabel
-                htmlFor='dateTo'
-                sx={{ fontSize: '0.875rem', mb: 0.5 }}
-              >
-                To:
-              </InputLabel>
-              <Input
-                value={createdTo}
-                onChange={e => setCreatedTo(e.target.value)}
-                type='date'
-                name='dateTo'
-                id='dateTo'
-                fullWidth
-              />
-            </Stack>
+            <TextField
+              id='dateFrom'
+              label='From'
+              type='date'
+              value={createdFrom}
+              onChange={e => setCreatedFrom(e.target.value)}
+              fullWidth
+            />
+            <TextField
+              id='dateTo'
+              label='To'
+              type='date'
+              value={createdTo}
+              onChange={e => setCreatedTo(e.target.value)}
+              fullWidth
+            />
           </Stack>
 
-          {/* Sort and Order Options */}
+          {/* Sort and Order */}
           <Stack
             direction={isMobile ? 'column' : 'row'}
             spacing={isMobile ? 1 : 2}
             sx={{ minWidth: isMobile ? '100%' : 'auto' }}
           >
             {/* Sort By */}
-            <Stack
-              className='sortOptions'
-              sx={{ minWidth: isMobile ? '100%' : '150px' }}
-            >
-              <InputLabel id='sortBy' sx={{ fontSize: '0.875rem', mb: 0.5 }}>
-                Sort By
-              </InputLabel>
-              <Select
-                name='sortBy'
-                id='sortBy'
-                fullWidth
-                value={sortBy}
-                onChange={e => setSortBy(e.target.value)}
-                size={isMobile ? 'small' : 'medium'}
-              >
-                <MenuItem value='updated'>Updated</MenuItem>
-                <MenuItem value='stars'>Stars</MenuItem>
-                <MenuItem value='forks'>Forks</MenuItem>
-                <MenuItem value='help-wanted-issues'>Issues</MenuItem>
-              </Select>
+            <Stack className='sortOptions' sx={{ minWidth: '150px' }}>
+              <FormControl fullWidth>
+                <InputLabel>
+                  Sort By
+                  <Select
+                    id='sortBy'
+                    name='sortBy'
+                    fullWidth
+                    value={sortBy}
+                    onChange={e => setSortBy(e.target.value)}
+                    size={isMobile ? 'small' : 'medium'}
+                  >
+                    <MenuItem value='updated'>Updated</MenuItem>
+                    <MenuItem value='stars'>Stars</MenuItem>
+                    <MenuItem value='forks'>Forks</MenuItem>
+                    <MenuItem value='help-wanted-issues'>Issues</MenuItem>
+                  </Select>
+                </InputLabel>
+              </FormControl>
             </Stack>
 
             {/* Order By */}
-            <Stack
-              className='orderOptions'
-              sx={{ minWidth: isMobile ? '100%' : '150px' }}
-            >
-              <InputLabel id='orderBy' sx={{ fontSize: '0.875rem', mb: 0.5 }}>
-                Order By
-              </InputLabel>
-              <Select
-                name='orderBy'
-                id='orderBy'
-                fullWidth
-                value={orderBy}
-                onChange={e => setOrderBy(e.target.value)}
-                labelId='orderBy'
-                size={isMobile ? 'small' : 'medium'}
-              >
-                <MenuItem value='desc'>Descending</MenuItem>
-                <MenuItem value='asc'>Ascending</MenuItem>
-              </Select>
+            <Stack className='orderOptions' sx={{ minWidth: '150px' }}>
+              <FormControl fullWidth>
+                <InputLabel>
+                  Order By
+                  <Select
+                    id='orderBy'
+                    name='orderBy'
+                    fullWidth
+                    value={orderBy}
+                    onChange={e => setOrderBy(e.target.value)}
+                    size={isMobile ? 'small' : 'medium'}
+                  >
+                    <MenuItem value='desc'>Descending</MenuItem>
+                    <MenuItem value='asc'>Ascending</MenuItem>
+                  </Select>
+                </InputLabel>
+              </FormControl>
             </Stack>
           </Stack>
         </Stack>
       </Box>
 
+      <Box className='introduction'>
+        <Typography
+          variant='h1'
+          component='h1'
+          fontSize={{ xs: '1.5rem', sm: '2rem', md: '2.5rem' }}
+          sx={{ color: '#111', lineHeight: 1.2 }} // ensure good contrast
+        >
+          GitHub Repository Search
+        </Typography>
+      </Box>
+
       {/* Results Section */}
-      <Box className='resultsContainer'>
+      <Box
+        className='resultsContainer'
+        role='region'
+        aria-live='polite'
+        aria-label='Repository search results'
+      >
         <RepositoryResults
           repositories={repositories}
           isLoading={isLoading}
@@ -212,7 +184,7 @@ function App() {
           searchTerm={searchTerm}
         />
 
-        {/* Load More Button (Mobile/Tablet preferred pattern) */}
+        {/* Load More (Mobile/Tablet) */}
         {hasMorePages && isTablet && (
           <Box sx={{ textAlign: 'center', mt: 2 }}>
             <Button
@@ -223,6 +195,7 @@ function App() {
               size={isMobile ? 'large' : 'medium'}
               fullWidth={isMobile}
               sx={{ minWidth: isMobile ? '100%' : '200px' }}
+              aria-label='Load more results'
             >
               {isLoading ? 'Loading...' : 'Load More'}
             </Button>
@@ -230,7 +203,7 @@ function App() {
         )}
       </Box>
 
-      {/* Pagination Controls (Desktop preferred pattern) */}
+      {/* Pagination (Desktop) */}
       {!isTablet && (
         <Box className='paginationContainer' sx={{ mt: 3 }}>
           <Grid container spacing={2} alignItems='center'>
@@ -241,12 +214,17 @@ function App() {
                 variant='contained'
                 color='primary'
                 fullWidth
+                aria-label='Go to previous page'
               >
                 Previous
               </Button>
             </Grid>
             <Grid size={4}>
-              <Box sx={{ textAlign: 'center', fontWeight: 'medium' }}>
+              <Box
+                sx={{ textAlign: 'center', fontWeight: 'medium' }}
+                role='status'
+                aria-live='polite'
+              >
                 Page {page}
               </Box>
             </Grid>
@@ -257,6 +235,7 @@ function App() {
                 variant='contained'
                 color='primary'
                 fullWidth
+                aria-label='Go to next page'
               >
                 Next
               </Button>
@@ -265,9 +244,13 @@ function App() {
         </Box>
       )}
 
-      {/* Mobile/Tablet Pagination Info */}
+      {/* Pagination Info (Mobile/Tablet) */}
       {isTablet && (
-        <Box sx={{ textAlign: 'center', py: 1 }}>
+        <Box
+          sx={{ textAlign: 'center', py: 1 }}
+          role='status'
+          aria-live='polite'
+        >
           <Box sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
             Page {page} of {totalPages || 1}
             {repositoryCount > 0 && (
