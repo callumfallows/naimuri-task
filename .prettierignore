@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Production builds
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.development
+
+# Cache
+.cache/
+.parcel-cache/
+.vite/
+
+# Coverage reports
+coverage/
+
+# Logs
+*.log
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Generated files
+.DS_Store
+.vscode/
+.idea/
+
+# Vite specific
+vite.config.ts.timestamp-*

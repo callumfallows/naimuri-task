@@ -1,6 +1,6 @@
 # GitHub API
 
-Create a project using React + Typescript SPA that connects to the GitHub API, allowing search and filtering of repository through an easy to use interface. 
+Create a project using React + Typescript SPA that connects to the GitHub API, allowing search and filtering of repository through an easy to use interface.
 
 ## Features
 
@@ -10,9 +10,7 @@ Create a project using React + Typescript SPA that connects to the GitHub API, a
 [ ] - Search
 [ ] - Filter
 
-
 ## Installation Instructions
-
 
 ### `Install dependencies`
 
@@ -28,11 +26,16 @@ npm start
 
 ## Implementation
 
-
 ### `Custom Hooks`
+
 ### `Debouncing`
+
 ### `Pagination`
+
 ### `Date Filtering`
+
 ### `Accessibility`
+
 ### `User Experience`
+
 ### `Testing`

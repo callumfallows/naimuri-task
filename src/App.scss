@@ -14,17 +14,16 @@ body {
   text-align: center;
 }
 
-
 .searchBar {
   width: 100%;
 }
 
 .dateOptions {
-    display: flex;
-    justify-content: space-between;
-    align-items: normal;
-    gap: 1rem;
-    margin: 1rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: normal;
+  gap: 1rem;
+  margin: 1rem 0;
 }
 
 .sortOptions {
@@ -38,7 +37,7 @@ body {
 .paginationButtons {
   display: flex;
   gap: 1rem;
-justify-content: space-between;
+  justify-content: space-between;
   align-items: center;
   margin-top: 1rem;
 }
